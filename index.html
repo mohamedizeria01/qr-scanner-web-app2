@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Scanner</title>
+    <title>QR Code Scanner - Ramadan Distribution</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,30 +13,60 @@
             padding: 20px;
             background-color: #f7f7f7;
         }
+
+        header {
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        #scanner-section {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
         video {
             width: 100%;
-            max-width: 500px;
-            margin-top: 20px;
+            max-width: 600px;
+            border: 1px solid black;
+            margin-bottom: 10px;
         }
+
         #result {
             font-size: 18px;
             margin-top: 20px;
             color: #333;
         }
-        .container {
-            text-align: center;
+
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #aaa;
         }
     </style>
 </head>
-<body>
-    <h1>QR Code Scanner</h1>
-    <div class="container">
-        <video id="video" autoplay></video> <!-- Video feed -->
-        <div id="result">Scanning...</div> <!-- Result display -->
-    </div>
 
-    <!-- Include the jsQR library -->
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<body>
+    <header>
+        <h1>Ramadan Food Distribution QR Code Scanner</h1>
+    </header>
+    
+    <main>
+        <section id="scanner-section">
+            <video id="video" width="100%" height="auto" style="border: 1px solid black;"></video>
+            <div id="result">
+                Scan a QR code to see the result here.
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <p>© 2025 Ramadan Distribution. All Rights Reserved.</p>
+    </footer>
 
     <script>
         const videoElement = document.getElementById("video");
@@ -89,17 +121,17 @@
                 const name = data[0].split(": ")[1];
                 const phone = data[1].split(": ")[1];
 
-                // Send data to Google Sheets API endpoint (optional)
-                fetch('YOUR_GOOGLE_APPS_SCRIPT_URL', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ name: name, phone: phone })
-                })
-                .then(response => response.text())
-                .then(data => console.log('Data successfully updated:', data))
-                .catch((error) => console.error('Error:', error));
+                // Optionally, you can send this data to a Google Sheets API endpoint (e.g., using fetch)
+                // fetch('YOUR_GOOGLE_APPS_SCRIPT_URL', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json'
+                //     },
+                //     body: JSON.stringify({ name: name, phone: phone })
+                // })
+                // .then(response => response.text())
+                // .then(data => console.log('Data successfully updated:', data))
+                // .catch((error) => console.error('Error:', error));
             } else {
                 // No QR code detected
                 console.log('No QR code detected');

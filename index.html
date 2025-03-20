@@ -3,30 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Scanner - Ramadan Distribution</title>
-    <link rel="stylesheet" href="styles/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.min.js"></script>
-
+    <title>QR Code Scanner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f7f7f7;
+        }
+        video {
+            width: 100%;
+            max-width: 500px;
+            margin-top: 20px;
+        }
+        #result {
+            font-size: 18px;
+            margin-top: 20px;
+            color: #333;
+        }
+        .container {
+            text-align: center;
+        }
+    </style>
 </head>
-
 <body>
-    <header>
-        <h1>Ramaaadan Food Distribution QR Code Scanner</h1>
-    </header>
-    
-    <main>
-        <section id="scanner-section">
-            <video id="video" width="100%" height="auto" style="border: 1px solid black;"></video>
-            <div id="result">
-                Scan a QR code to see the result here.
-            </div>
-        </section>
-    </main>
-    
-    <footer>
-        <p>© 2025 Ramadan Distribution. All Rights Reserved.</p>
-    </footer>
+    <h1>QR Code Scanner</h1>
+    <div class="container">
+        <video id="video" autoplay></video> <!-- Video feed -->
+        <div id="result">Scanning...</div> <!-- Result display -->
+    </div>
 
-    <script src="scripts/script.js"></script>
+    <!-- Include the jsQR library -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+
+    <script>
+        const videoElement = document.getElementById("video");
+        const resultDiv = document.getElementById("result");
+
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+            .then(stream => {
+                videoElement.srcObject = stream;
+                videoElement.play();
+                console.log('Camera stream started');
+                requestAnimationFrame(scanQRCode);
+            })
+            .catch(error => {
+                console.error("Error accessing camera: ", error);
+                resultDiv.textContent = "Error accessing camera.";
+            });
+
+        function scanQRCode() {
+            // Create a canvas and set its size to match the video element's size
+            const canvas = document.createElement("canvas");
+            const context = canvas.getContext("2d");
+
+            // Update canvas dimensions based on video element dimensions
+            const videoWidth = videoElement.videoWidth || videoElement.clientWidth;
+            const videoHeight = videoElement.videoHeight || videoElement.clientHeight;
+
+            if (videoWidth && videoHeight) {
+                canvas.width = videoWidth;
+                canvas.height = videoHeight;
+            } else {
+                console.log("Unable to get video dimensions.");
+                resultDiv.textContent = "Unable to get video dimensions.";
+                return;
+            }
+
+            // Draw the video frame onto the canvas
+            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+            // Get the image data from the canvas
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+            // Use jsQR to scan the QR code from the image data
+            const code = jsQR(imageData.data, canvas.width, canvas.height);
+
+            if (code) {
+                // QR Code detected
+                console.log('QR Code detected:', code.data);
+                resultDiv.textContent = `QR Code Data: ${code.data}`;
+                
+                // Split QR Code Data to get name and phone number
+                const data = code.data.split("\n");
+                const name = data[0].split(": ")[1];
+                const phone = data[1].split(": ")[1];
+
+                // Send data to Google Sheets API endpoint (optional)
+                fetch('YOUR_GOOGLE_APPS_SCRIPT_URL', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name: name, phone: phone })
+                })
+                .then(response => response.text())
+                .then(data => console.log('Data successfully updated:', data))
+                .catch((error) => console.error('Error:', error));
+            } else {
+                // No QR code detected
+                console.log('No QR code detected');
+                resultDiv.textContent = "Scanning...";
+            }
+
+            // Call the scanQRCode function recursively to keep scanning
+            requestAnimationFrame(scanQRCode);
+        }
+    </script>
 </body>
 </html>

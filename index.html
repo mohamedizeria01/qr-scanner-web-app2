@@ -121,17 +121,17 @@
                 const name = data[0].split(": ")[1];
                 const phone = data[1].split(": ")[1];
 
-                // Optionally, you can send this data to a Google Sheets API endpoint (e.g., using fetch)
-                // fetch('YOUR_GOOGLE_APPS_SCRIPT_URL', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json'
-                //     },
-                //     body: JSON.stringify({ name: name, phone: phone })
-                // })
-                // .then(response => response.text())
-                // .then(data => console.log('Data successfully updated:', data))
-                // .catch((error) => console.error('Error:', error));
+                Optionally, you can send this data to a Google Sheets API endpoint (e.g., using fetch)
+                fetch('https://script.google.com/macros/s/AKfycbyH4fd5GMlb7bv-4M_WlPx-kbJ-ZSSlVIDfVwo511R_63vuQnQMofGCflshCdm0JhAhpQ/exec', {
+                     method: 'POST',
+                     headers: {
+                        'Content-Type': 'application/json'
+                      },
+                     body: JSON.stringify({ name: name, phone: phone })
+                 })
+                 .then(response => response.text())
+                 .then(data => console.log('Data successfully updated:', data))
+                 .catch((error) => console.error('Error:', error));
             } else {
                 // No QR code detected
                 console.log('No QR code detected');
